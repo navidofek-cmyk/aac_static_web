@@ -10,7 +10,7 @@ Webová aplikace pro výuku čtení a počítání určená dětem s PAS (poruch
 
 | # | Název | Obsah |
 |---|---|---|
-| 1 | **Slabiky** | Otevřené slabiky po skupinách (M, L, S, P, T, V, B, N, D, K, J, R) |
+| 1 | **Slabiky** | Všechny české souhlásky (M,L,S,P,T,V,B,N,D,K,J,R,F,G,H,CH,Z,Ž,Š,Č,C,Ř) + ukázková slova s obrázkem u každé skupiny |
 | 2 | **Slova** | ~27 slov s ARASAAC / Mulberry obrázky, klikací slabiky |
 | 3 | **Věty** | 15 krátkých vět s klikacími slovy |
 | 4 | **Krátké pohádky** | 3 příběhy složené z naučených slov |

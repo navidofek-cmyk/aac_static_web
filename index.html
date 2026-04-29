@@ -553,7 +553,16 @@
       <button class="pill active" data-mathmode="add">+ sčítání</button>
       <button class="pill" data-mathmode="sub">− odčítání</button>
       <button class="pill" data-mathmode="series">řady</button>
+      <button class="pill" data-mathmode="series2">řady L2</button>
       <button class="pill" data-mathmode="decomp">rozklad</button>
+    </div>
+
+    <div class="sym-pick-row" id="mathMaxRow">
+      <label>Max:</label>
+      <button class="pill" data-mathmax="5">do 5</button>
+      <button class="pill active" data-mathmax="10">do 10</button>
+      <button class="pill" data-mathmax="15">do 15</button>
+      <button class="pill" data-mathmax="20">do 20</button>
     </div>
 
     <div class="sym-pick-row">
@@ -717,7 +726,7 @@ const state = {
   autoSpeak: 'on', focusMode: 'on', breakAfter: 5,
   sessionItems: 0,
   progress: { syllables: 0, words: 0, sentences: 0, stories: 0, math: 0 },
-  mathMode: 'add', mathSym: '●', mathIdx: 0, mathProblems: [], mathStreak: 0,
+  mathMode: 'add', mathSym: '●', mathMax: 10, mathIdx: 0, mathProblems: [], mathStreak: 0,
   totalStars: 0,
   voice: null,
 };
@@ -1169,40 +1178,59 @@ function shuffle(arr) {
   }
   return arr;
 }
-function makeOptions(answer) {
-  const pool = shuffle([...Array(16).keys()].filter(n => n !== answer));
-  // prefer nearby distractors
+function makeOptions(answer, max) {
+  const hi = max || 20;
+  const pool = shuffle([...Array(hi + 1).keys()].filter(n => n !== answer && n >= 0));
   pool.sort((a, b) => Math.abs(a - answer) - Math.abs(b - answer));
   return shuffle([answer, pool[0], pool[1], pool[2]]);
 }
 
 function generateMathProblems(mode) {
+  const max = state.mathMax;
   const problems = [];
   let attempts = 0;
-  while (problems.length < 10 && attempts < 100) {
+  while (problems.length < 10 && attempts < 300) {
     attempts++;
     let p;
     if (mode === 'add') {
-      const a = rand(1, 9), b = rand(1, Math.min(9, 15 - a));
+      const a = rand(1, max - 1);
+      const b = rand(1, max - a);
       p = { label: `${a} + ${b} = ?`, answer: a + b, symA: a, symB: b, op: '+' };
     } else if (mode === 'sub') {
-      const ans = rand(1, 12), b = rand(1, Math.min(ans, 9));
+      const ans = rand(1, max - 1);
+      const b = rand(1, Math.min(ans, max - ans));
       const a = ans + b;
-      if (a > 15) continue;
+      if (a > max) continue;
       p = { label: `${a} − ${b} = ?`, answer: ans, symA: a, symB: b, op: '−' };
     } else if (mode === 'series') {
-      const step = rand(1, 3), start = rand(1, 5);
-      const nums = [0,1,2,3,4].map(i => start + i * step);
-      if (nums[4] > 15) continue;
+      // Level 1: krok 1, vzestupně nebo sestupně
+      const dir = Math.random() > 0.5 ? 1 : -1;
+      const start = dir === 1 ? rand(1, Math.max(1, max - 4)) : rand(5, max);
+      const nums = [0,1,2,3,4].map(i => start + i * dir);
+      if (nums.some(n => n < 1 || n > max)) continue;
       const blankIdx = rand(1, 3);
-      const answer = nums[blankIdx];
-      const label = nums.map((n, i) => i === blankIdx ? '?' : n).join(', ');
-      p = { label, answer, symA: null };
+      p = { label: nums.map((n,i) => i===blankIdx ? '?' : n).join(', '),
+            answer: nums[blankIdx], symA: null };
+    } else if (mode === 'series2') {
+      // Level 2: krok 2 nebo 3
+      const step = rand(2, 3);
+      const dir = Math.random() > 0.5 ? step : -step;
+      const start = dir > 0 ? rand(1, Math.max(1, max - 4*step))
+                             : rand(1 + 4*Math.abs(dir), max);
+      const nums = [0,1,2,3,4].map(i => start + i * dir);
+      if (nums.some(n => n < 0 || n > max)) continue;
+      const blankIdx = rand(1, 3);
+      p = { label: nums.map((n,i) => i===blankIdx ? '?' : n).join(', '),
+            answer: nums[blankIdx], symA: null };
     } else {
-      const total = rand(4, 15), a = rand(1, total - 1);
+      // decomp
+      const total = rand(3, max);
+      if (total < 3) continue;
+      const a = rand(1, total - 1);
       p = { label: `${total} = ${a} + ?`, answer: total - a, symA: total, symB: a, op: 'decomp' };
     }
-    p.options = makeOptions(p.answer);
+    if (!p) continue;
+    p.options = makeOptions(p.answer, max);
     problems.push(p);
   }
   return problems;
@@ -1324,6 +1352,17 @@ document.querySelectorAll('.sym-pick').forEach(p => {
     document.querySelectorAll('.sym-pick').forEach(x => x.classList.remove('active'));
     p.classList.add('active');
     state.mathSym = p.getAttribute('data-sym');
+    renderMath();
+  });
+});
+
+document.querySelectorAll('#mathMaxRow .pill').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('#mathMaxRow .pill').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    state.mathMax = parseInt(p.getAttribute('data-mathmax'));
+    state.mathProblems = generateMathProblems(state.mathMode);
+    state.mathIdx = 0; state.mathStreak = 0;
     renderMath();
   });
 });

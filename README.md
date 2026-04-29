@@ -14,7 +14,7 @@ Webová aplikace pro výuku čtení a počítání určená dětem s PAS (poruch
 | 2 | **Slova** | ~27 slov s ARASAAC / Mulberry obrázky, klikací slabiky |
 | 3 | **Věty** | 15 krátkých vět s klikacími slovy |
 | 4 | **Krátké pohádky** | 3 příběhy složené z naučených slov |
-| 5 | **Počítání** | Sčítání, odčítání, řady, rozklad čísel do 15 s vizuálními symboly |
+| 5 | **Počítání** | Sčítání, odčítání, řady (L1/L2), rozklad — volitelné max. číslo (do 5/10/15/20), vizuální symboly |
 
 ---
 

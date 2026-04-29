@@ -150,6 +150,11 @@
   }
   .tile:hover, .tile:active { background: var(--accent-soft); border-color: var(--accent); }
   .tile.speaking { background: var(--highlight); border-color: var(--gold); }
+  .tile-word {
+    display: block; font-size: 0.65rem; font-weight: 400;
+    color: var(--ink-soft); margin-top: 0.2rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
 
   /* Focus tile — single large syllable */
   .focus-tile {
@@ -626,6 +631,75 @@
 <script>
 /* ════ CONTENT ════ */
 
+const SYLLABLE_WORDS = {
+  // B
+  'ba':'balón',    'be':'beruška',  'bi':'bicykl',   'bo':'bobr',     'bu':'bublina',
+  'bá':'bábovka',  'bé':'',         'bí':'bílý',     'bů':'bůh',
+  // M
+  'ma':'malina',   'me':'medvěd',   'mi':'miminko',  'mo':'moře',     'mu':'muzika',
+  'má':'mák',      'mé':'',         'mí':'míček',    'mů':'můra',
+  // L
+  'la':'labuť',    'le':'lev',      'li':'liška',    'lo':'louka',    'lu':'luna',
+  'lá':'láhev',    'lé':'léto',     'lí':'lípa',     'lů':'lůžko',
+  // S
+  'sa':'salát',    'se':'seno',     'si':'silnice',  'so':'sopka',    'su':'sukně',
+  'sá':'sáně',     'sé':'',         'sí':'síla',     'sů':'sůl',
+  // P
+  'pa':'pavouk',   'pe':'pelikán',  'pi':'piráti',   'po':'pohádka',  'pu':'puma',
+  'pá':'páv',      'pé':'',         'pí':'píseň',    'pů':'půda',
+  // T
+  'ta':'talíř',    'te':'televize', 'ti':'tiskárna', 'to':'topinka',  'tu':'tulipán',
+  'tá':'táta',     'té':'',         'tí':'tíha',     'tů':'tůň',
+  // V
+  'va':'vafle',    've':'vesnice',  'vi':'vinice',   'vo':'vodník',   'vu':'',
+  'vá':'váza',     'vé':'',         'ví':'víla',     'vů':'vůně',
+  // N
+  'na':'nápoj',    'ne':'nebe',     'ni':'nitě',     'no':'noc',      'nu':'nudle',
+  'ná':'nádoba',   'né':'',         'ní':'',          'nů':'nůž',
+  // D
+  'da':'datel',    'de':'deštník',  'di':'dinosaurus','do':'domov',   'du':'duha',
+  'dá':'dárek',    'dé':'',         'dí':'dítě',     'dů':'důvod',
+  // K
+  'ka':'kaluž',    'ke':'keř',      'ki':'kino',     'ko':'kočka',    'ku':'kuličky',
+  'ká':'kámen',    'ké':'',         'kí':'',          'ků':'kůň',
+  // J
+  'ja':'jahoda',   'je':'jelen',    'ji':'jinak',    'jo':'jojo',     'ju':'',
+  'já':'jáma',     'jé':'',         'jí':'jídlo',    'jů':'',
+  // R
+  'ra':'raketa',   're':'restaurace','ri':'',         'ro':'rohlík',   'ru':'rukavice',
+  'rá':'ráno',     'ré':'réva',     'rí':'',          'rů':'růže',
+  // F
+  'fa':'fazole',   'fe':'fena',     'fi':'film',     'fo':'fotbal',   'fu':'',
+  'fá':'fára',     'fé':'fénix',    'fí':'fík',      'fů':'fůra',
+  // G
+  'ga':'galerie',  'ge':'gesto',    'gi':'gitara',   'go':'golf',     'gu':'guma',
+  'gá':'gáza',     'gé':'génius',   'gí':'',          'gů':'',
+  // H
+  'ha':'had',      'he':'herec',    'hi':'hiena',    'ho':'hora',     'hu':'husa',
+  'há':'háček',    'hé':'',         'hí':'',          'hů':'hůl',
+  // CH
+  'cha':'chata',   'che':'chemie',  'chi':'chirurg', 'cho':'chodník', 'chu':'chuť',
+  'chá':'chápe',   'ché':'',        'chí':'',        'chů':'chůva',
+  // Z
+  'za':'zahrada',  'ze':'zelenina', 'zi':'zima',     'zo':'zoo',      'zu':'zuby',
+  'zá':'záhada',   'zé':'',         'zí':'zítra',    'zů':'',
+  // Ž
+  'ža':'žalud',    'že':'želva',    'ži':'život',    'žo':'',         'žu':'župan',
+  'žá':'žába',     'žé':'',         'ží':'žízeň',    'žů':'',
+  // Š
+  'ša':'šátek',    'še':'šedý',     'ši':'šiška',    'šo':'šofér',    'šu':'šumivý',
+  'šá':'šálek',    'šé':'šéf',      'ší':'šíp',      'šů':'',
+  // Č
+  'ča':'čajník',   'če':'čerstvý',  'či':'čistý',    'čo':'čokoláda', 'ču':'',
+  'čá':'čáp',      'čé':'',         'čí':'číslice',  'čů':'',
+  // C
+  'ca':'',         'ce':'cesta',    'ci':'cibule',   'co':'cola',     'cu':'cukrárna',
+  'cá':'',         'cé':'cédé',     'cí':'cíl',      'ců':'',
+  // Ř
+  'řa':'řapík',    'ře':'řetěz',    'ři':'řidič',    'řo':'',         'řu':'',
+  'řá':'řád',      'řé':'',         'ří':'říjen',    'řů':'',
+};
+
 const SYLLABLE_GROUPS = [
   { label: 'M', items: ['má','ma','mé','me','mí','mi','mo','mů','mu'], words: ['mísa','maso','máme'] },
   { label: 'L', items: ['lá','la','lé','le','lí','li','lo','lů','lu'], words: ['lupa','léto'] },
@@ -962,6 +1036,17 @@ function renderSyllables(autoplay = false) {
     tile.addEventListener('click', () => speak(syl, tile));
     reader.appendChild(tile);
 
+    const fw = SYLLABLE_WORDS[syl];
+    if (fw) {
+      const wordBtn = document.createElement('button');
+      wordBtn.style.cssText = 'background:none;border:1px solid var(--line);border-radius:10px;' +
+        'font-family:Lexend,sans-serif;font-size:1.5rem;font-weight:500;color:var(--ink);' +
+        'padding:0.5rem 1.2rem;cursor:pointer;width:100%;margin-top:0.5rem;';
+      wordBtn.textContent = fw;
+      wordBtn.addEventListener('click', () => speak(fw, wordBtn));
+      reader.appendChild(wordBtn);
+    }
+
     if (autoplay && state.autoSpeak === 'on') speak(syl, tile);
 
   } else {
@@ -976,7 +1061,14 @@ function renderSyllables(autoplay = false) {
     grid.className = 'syl-grid';
     group.items.forEach(s => {
       const t = document.createElement('button');
-      t.className = 'tile'; t.textContent = s;
+      t.className = 'tile';
+      t.appendChild(document.createTextNode(s));
+      const w = SYLLABLE_WORDS[s];
+      if (w) {
+        const ws = document.createElement('span');
+        ws.className = 'tile-word'; ws.textContent = w;
+        t.appendChild(ws);
+      }
       t.addEventListener('click', () => speak(s, t));
       grid.appendChild(t);
     });

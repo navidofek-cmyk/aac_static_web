@@ -773,6 +773,28 @@ const WORD_PICS = {
   'žába':28473, 'šála':2290,  'fena':7202,   'chata':8049,
   'šiška':8668, 'čáp':3015,   'zuby':2737,   'cesta':2302,
   'řeka':2811,  'guma':2409,  'garáž':6003,  'bubák':5469,
+  // slabikové slova
+  'balón':3241,   'beruška':2924,  'bobr':7055,    'bublina':8389,  'bílý':8043,
+  'malina':36540, 'medvěd':2488,   'miminko':6060, 'moře':2925,     'mák':6897,
+  'míček':2514,   'můra':27982,    'labuť':2337,   'lev':25187,     'liška':2623,
+  'láhev':2288,   'lůžko':6954,    'salát':2377,   'sopka':6247,    'sukně':2391,
+  'sáně':8710,    'sůl':25576,     'pavouk':38275, 'pelikán':6174,  'piráti':6180,
+  'pohádka':2364, 'puma':9068,     'páv':13348,    'píseň':24791,   'půda':3160,
+  'talíř':16857,  'televize':25498,'tiskárna':26138,'tulipán':3163,  'vafle':34227,
+  'vesnice':2823, 'víla':5482,     'vůně':25275,   'nápoj':30403,   'nebe':6978,
+  'nitě':2978,    'noc':26997,     'nudle':8584,   'nádoba':6940,   'deštník':2500,
+  'dinosaurus':2738,'domov':6964,  'dárek':25381,  'dítě':27509,    'keř':30241,
+  'kino':30387,   'kuličky':10281, 'kámen':6594,   'jahoda':2400,   'jelen':3263,
+  'jojo':8734,    'jáma':6036,     'raketa':2344,  'restaurace':32408,'rohlík':2358,
+  'rukavice':2415,'ráno':25704,    'réva':34179,   'růže':3151,     'film':9183,
+  'fénix':38764,  'fík':2979,      'galerie':6566, 'golf':10160,    'gáza':27794,
+  'had':2568,     'herec':36075,   'háček':2744,   'chemie':36374,  'chirurg':3187,
+  'chodník':2247, 'zahrada':2974,  'zelenina':29131,'zítra':38278,  'žalud':8041,
+  'želva':26503,  'život':8717,    'župan':5369,   'žízeň':4963,   'šátek':5417,
+  'šedý':3340,    'šofér':6459,    'šálek':2581,   'šíp':5471,     'čerstvý':38046,
+  'čistý':26172,  'čokoláda':25940,'číslice':34773,'cibule':2323,   'cola':2338,
+  'cukrárna':3361,'cédé':2322,     'cíl':11236,    'řapík':8492,   'řetěz':5934,
+  'řidič':3019,   'říjen':6571,
 };
 
 const SENTENCES = [
@@ -1038,13 +1060,25 @@ function renderSyllables(autoplay = false) {
 
     const fw = SYLLABLE_WORDS[syl];
     if (fw) {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'width:100%;display:flex;flex-direction:column;align-items:center;gap:0.4rem;margin-top:0.5rem;';
+      const picVal = WORD_PICS[fw];
+      if (picVal) {
+        const img = document.createElement('img');
+        img.style.cssText = 'width:110px;height:110px;object-fit:contain;border-radius:10px;';
+        img.src = typeof picVal === 'number'
+          ? `https://static.arasaac.org/pictograms/${picVal}/${picVal}_300.png` : picVal;
+        img.alt = fw; img.loading = 'lazy';
+        wrap.appendChild(img);
+      }
       const wordBtn = document.createElement('button');
       wordBtn.style.cssText = 'background:none;border:1px solid var(--line);border-radius:10px;' +
         'font-family:Lexend,sans-serif;font-size:1.5rem;font-weight:500;color:var(--ink);' +
-        'padding:0.5rem 1.2rem;cursor:pointer;width:100%;margin-top:0.5rem;';
+        'padding:0.5rem 1.2rem;cursor:pointer;width:100%;';
       wordBtn.textContent = fw;
       wordBtn.addEventListener('click', () => speak(fw, wordBtn));
-      reader.appendChild(wordBtn);
+      wrap.appendChild(wordBtn);
+      reader.appendChild(wrap);
     }
 
     if (autoplay && state.autoSpeak === 'on') speak(syl, tile);

@@ -179,6 +179,14 @@
     width: 100%; background: var(--paper-soft);
     border: 1px solid var(--line); border-radius: var(--radius); padding: 2rem 1.5rem;
   }
+  .word-pic {
+    display: block;
+    width: 160px; height: 160px;
+    object-fit: contain;
+    margin: 0 auto 1.2rem;
+    border-radius: 12px;
+  }
+
   .word-display {
     font-family: 'Lexend', sans-serif; font-weight: 500;
     font-size: var(--reading-size); text-align: center;
@@ -529,12 +537,23 @@ const WORDS = [
   ['Ema'], ['Eva'],
   ['mí','sa'], ['vá','za'], ['vo','da'], ['no','ha'],
   ['so','va'], ['vo','sa'], ['ko','sa'], ['lu','pa'],
-  ['ko','lo'], ['po','le'], ['se','lo'], ['te','le'],
+  ['ko','lo'], ['po','le'], ['ry','ba'], ['te','le'],
   ['me','le'], ['ve','de'], ['vi','dí'], ['se','dí'],
   ['du','ha'],
   ['má','me'], ['pe','ro'],
   ['ma','so'], ['lé','to'], ['jí','dlo'],
 ];
+
+const WORD_PICS = {
+  'táta':31146, 'baba':23710, 'bába':23710,
+  'Ema':2567,   'Eva':23729,
+  'mísa':3257,  'váza':3271,  'voda':32464, 'noha':25327,
+  'sova':2671,  'vosa':6925,  'kosa':8642,  'lupa':9927,
+  'kolo':6935,  'pole':2683,  'ryba':2520,  'tele':26489,
+  'mele':3003,  'vede':8994,  'vidí':6564,  'sedí':11370,
+  'duha':2986,  'máme':2464,  'pero':3246,
+  'maso':2316,  'léto':5604,  'jídlo':4610,
+};
 
 const SENTENCES = [
   'Táta má kolo.',
@@ -856,9 +875,24 @@ function renderWord(autoplay = false) {
     dots.appendChild(d);
   });
 
-  display.innerHTML = '';
   const word     = WORDS[state.wordIdx];
   const fullText = word.join('');
+
+  // ARASAAC picture
+  const card = display.parentElement;
+  const oldPic = card.querySelector('.word-pic');
+  if (oldPic) oldPic.remove();
+  const picId = WORD_PICS[fullText];
+  if (picId) {
+    const img = document.createElement('img');
+    img.className = 'word-pic';
+    img.src = `https://static.arasaac.org/pictograms/${picId}/${picId}_300.png`;
+    img.alt = fullText;
+    img.loading = 'lazy';
+    card.insertBefore(img, display);
+  }
+
+  display.innerHTML = '';
 
   if (state.syllables === 'on' && word.length > 1) {
     word.forEach((syl, i) => {

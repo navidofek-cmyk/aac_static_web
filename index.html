@@ -627,18 +627,28 @@
 /* ════ CONTENT ════ */
 
 const SYLLABLE_GROUPS = [
-  { label: 'M', items: ['má','ma','mé','me','mí','mi','mo','mů','mu'] },
-  { label: 'L', items: ['lá','la','lé','le','lí','li','lo','lů','lu'] },
-  { label: 'S', items: ['sa','se','si','so','su','sá','sé','sí','sů'] },
-  { label: 'P', items: ['pa','pe','pi','po','pu','pá','pé','pí','pů'] },
-  { label: 'T', items: ['ta','te','ti','to','tu','tá','té','tí','tů'] },
-  { label: 'V', items: ['va','ve','vi','vo','vu','vá','vé','ví','vů'] },
-  { label: 'B', items: ['ba','be','bi','bo','bu','bá','bé','bí','bů'] },
-  { label: 'N', items: ['na','ne','ni','no','nu','ná','né','ní','nů'] },
-  { label: 'D', items: ['da','de','di','do','du','dá','dé','dí','dů'] },
-  { label: 'K', items: ['ka','ke','ki','ko','ku','ká','ké','kí','ků'] },
-  { label: 'J', items: ['ja','je','ji','jo','ju','já','jé','jí','jů'] },
-  { label: 'R', items: ['ra','re','ri','ro','ru','rá','ré','rí','rů'] },
+  { label: 'M', items: ['má','ma','mé','me','mí','mi','mo','mů','mu'], words: ['mísa','maso','máme'] },
+  { label: 'L', items: ['lá','la','lé','le','lí','li','lo','lů','lu'], words: ['lupa','léto'] },
+  { label: 'S', items: ['sa','se','si','so','su','sá','sé','sí','sů'], words: ['sova','sedí'] },
+  { label: 'P', items: ['pa','pe','pi','po','pu','pá','pé','pí','pů'], words: ['pero','pole'] },
+  { label: 'T', items: ['ta','te','ti','to','tu','tá','té','tí','tů'], words: ['táta','tele'] },
+  { label: 'V', items: ['va','ve','vi','vo','vu','vá','vé','ví','vů'], words: ['voda','váza','vosa'] },
+  { label: 'B', items: ['ba','be','bi','bo','bu','bá','bé','bí','bů'], words: ['baba','bába','bubák'] },
+  { label: 'N', items: ['na','ne','ni','no','nu','ná','né','ní','nů'], words: ['noha'] },
+  { label: 'D', items: ['da','de','di','do','du','dá','dé','dí','dů'], words: ['duha'] },
+  { label: 'K', items: ['ka','ke','ki','ko','ku','ká','ké','kí','ků'], words: ['kolo','koza'] },
+  { label: 'J', items: ['ja','je','ji','jo','ju','já','jé','jí','jů'], words: ['jídlo'] },
+  { label: 'R', items: ['ra','re','ri','ro','ru','rá','ré','rí','rů'], words: ['ryba'] },
+  { label: 'F', items: ['fa','fe','fi','fo','fu','fá','fé','fí','fů'], words: ['fena'] },
+  { label: 'G', items: ['ga','ge','gi','go','gu','gá','gé','gí','gů'], words: ['guma','garáž'] },
+  { label: 'H', items: ['ha','he','hi','ho','hu','há','hé','hí','hů'], words: ['hora','husa'] },
+  { label: 'CH', items: ['cha','che','chi','cho','chu','chá','ché','chí','chů'], words: ['chata'] },
+  { label: 'Z', items: ['za','ze','zi','zo','zu','zá','zé','zí','zů'], words: ['záda','zima','zuby'] },
+  { label: 'Ž', items: ['ža','že','ži','žo','žu','žá','žé','ží','žů'], words: ['žába'] },
+  { label: 'Š', items: ['ša','še','ši','šo','šu','šá','šé','ší','šů'], words: ['šála','šiška'] },
+  { label: 'Č', items: ['ča','če','či','čo','ču','čá','čé','čí','čů'], words: ['čáp'] },
+  { label: 'C', items: ['ca','ce','ci','co','cu','cá','cé','cí','ců'], words: ['cesta'] },
+  { label: 'Ř', items: ['řa','ře','ři','řo','řu','řá','řé','ří','řů'], words: ['řeka'] },
 ];
 
 const WORDS = [
@@ -648,10 +658,30 @@ const WORDS = [
   ['so','va'], ['vo','sa'], ['ko','za'], ['lu','pa'],
   ['ko','lo'], ['po','le'], ['ry','ba'], ['te','le'],
   ['me','le'], ['ve','de'], ['vi','dí'], ['se','dí'],
-  ['du','ha'],
-  ['má','me'], ['pe','ro'],
-  ['ma','so'], ['lé','to'], ['jí','dlo'],
-  ['au','to'],
+  ['du','ha'], ['má','me'], ['pe','ro'],
+  ['ma','so'], ['lé','to'], ['jí','dlo'], ['au','to'],
+  // H
+  ['ho','ra'], ['hu','sa'],
+  // F
+  ['fe','na'],
+  // G
+  ['gu','ma'], ['ga','ráž'],
+  // CH
+  ['cha','ta'],
+  // Z
+  ['zá','da'], ['zi','ma'], ['zu','by'],
+  // Ž
+  ['žá','ba'],
+  // Š
+  ['šá','la'], ['ši','ška'],
+  // Č
+  ['čáp'],
+  // C
+  ['ces','ta'],
+  // Ř
+  ['ře','ka'],
+  // B extra
+  ['bu','bák'],
 ];
 
 const WORD_PICS = {
@@ -664,8 +694,11 @@ const WORD_PICS = {
   'kolo':6935,  'pole':2683,  'ryba':2520,  'tele':26489,
   'vede':8994,  'vidí':6564,  'sedí':11370,
   'duha':2986,  'máme':7271,  'pero':3246,
-  'maso':2316,  'léto':5604,  'jídlo':4610,
-  'auto':2339,
+  'maso':2316,  'léto':5604,  'jídlo':4610,  'auto':2339,
+  'hora':2909,  'husa':2878,  'záda':2748,   'zima':5493,
+  'žába':28473, 'šála':2290,  'fena':7202,   'chata':8049,
+  'šiška':8668, 'čáp':3015,   'zuby':2737,   'cesta':2302,
+  'řeka':2811,  'guma':2409,  'garáž':6003,  'bubák':5469,
 };
 
 const SENTENCES = [
@@ -869,6 +902,32 @@ function renderHome() {
 
 /* ════ SYLLABLES ════ */
 
+function renderSylGroupWord(wordText) {
+  const entry = WORDS.find(w => w.join('') === wordText) || [wordText];
+  const picVal = WORD_PICS[wordText];
+  const card = document.createElement('div');
+  card.style.cssText = 'display:inline-flex;flex-direction:column;align-items:center;' +
+    'padding:0.5rem 0.7rem;cursor:pointer;border:1px solid var(--line);' +
+    'border-radius:10px;background:var(--paper);min-width:72px;transition:background 0.15s;';
+  card.addEventListener('mouseenter', () => card.style.background = 'var(--accent-soft)');
+  card.addEventListener('mouseleave', () => card.style.background = 'var(--paper)');
+  if (picVal) {
+    const img = document.createElement('img');
+    img.style.cssText = 'width:64px;height:64px;object-fit:contain;margin-bottom:0.3rem;';
+    img.src = typeof picVal === 'number'
+      ? `https://static.arasaac.org/pictograms/${picVal}/${picVal}_300.png` : picVal;
+    img.alt = wordText;
+    img.loading = 'lazy';
+    card.appendChild(img);
+  }
+  const lbl = document.createElement('div');
+  lbl.style.cssText = 'font-family:Lexend,sans-serif;font-weight:500;font-size:0.95rem;text-align:center;';
+  lbl.textContent = entry.length > 1 ? entry.join('·') : wordText;
+  card.appendChild(lbl);
+  card.addEventListener('click', () => speak(wordText, card));
+  return card;
+}
+
 function renderSyllables(autoplay = false) {
   const reader = document.getElementById('sylReader');
   const dots   = document.getElementById('sylDots');
@@ -922,6 +981,19 @@ function renderSyllables(autoplay = false) {
       grid.appendChild(t);
     });
     reader.appendChild(grid);
+  }
+
+  // Slova ke skupině
+  if (group.words && group.words.length) {
+    const wLabel = document.createElement('div');
+    wLabel.className = 'group-label';
+    wLabel.style.marginTop = '1.2rem';
+    wLabel.textContent = 'Slova se skupinou ' + group.label;
+    reader.appendChild(wLabel);
+    const wRow = document.createElement('div');
+    wRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:0.6rem;width:100%;';
+    group.words.forEach(w => wRow.appendChild(renderSylGroupWord(w)));
+    reader.appendChild(wRow);
   }
 
   const atStart = state.sylIdx === 0 && (state.focusMode === 'off' || state.sylItemIdx === 0);

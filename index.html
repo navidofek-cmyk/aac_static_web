@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Čtení – krok za krokem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FAF6EE;
+    --paper-soft: #F1EBDC;
+    --ink: #2A2218;
+    --ink-soft: #5A4E3C;
+    --accent: #4A6B4F;
+    --accent-soft: #E3EAD9;
+    --warn: #C9784A;
+    --gold: #C99748;
+    --line: #DCD4C0;
+    --highlight: #FFE9A8;
+    --radius: 14px;
+    --reading-size: 2.4rem;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Lexend', system-ui, sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(201,151,72,0.04) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(74,107,79,0.04) 0%, transparent 40%);
+  }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 1.25rem 1.25rem 4rem; }
+
+  /* ── Top bar ── */
+  header.bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.5rem; padding: 0.75rem 0;
+    border-bottom: 1px solid var(--line); margin-bottom: 1.5rem;
+  }
+  .brand {
+    font-family: 'Fraunces', serif; font-weight: 600;
+    font-size: 1.1rem; letter-spacing: -0.01em; color: var(--ink);
+  }
+  .home-btn {
+    background: transparent; border: 1px solid var(--line);
+    color: var(--ink); font-family: inherit; font-size: 0.95rem;
+    padding: 0.5rem 0.9rem; border-radius: 999px; cursor: pointer;
+    transition: background 0.15s; min-height: 44px;
+  }
+  .home-btn:hover, .home-btn:active { background: var(--paper-soft); }
+  .stars-row {
+    font-family: 'Fraunces', serif; font-size: 1.1rem;
+    color: var(--gold); letter-spacing: 0.1em;
+  }
+
+  /* ── Section title ── */
+  h1.section-title {
+    font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 2rem; letter-spacing: -0.02em; margin: 0 0 0.25rem;
+  }
+  .section-sub { color: var(--ink-soft); font-size: 0.95rem; margin-bottom: 1.75rem; }
+
+  /* ── Menu ── */
+  .menu { display: grid; gap: 0.9rem; }
+  .menu-card {
+    display: block; width: 100%; text-align: left;
+    background: var(--paper-soft); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 1.4rem 1.5rem;
+    cursor: pointer; font-family: inherit; color: var(--ink);
+    transition: transform 0.1s, background 0.15s; position: relative;
+    min-height: 80px;
+  }
+  .menu-card:hover, .menu-card:active { background: #ECE4CE; transform: translateY(-1px); }
+  .menu-card .num {
+    font-family: 'Fraunces', serif; font-size: 0.85rem;
+    color: var(--ink-soft); letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .menu-card .title {
+    font-family: 'Fraunces', serif; font-size: 1.7rem;
+    font-weight: 500; line-height: 1.1; margin: 0.25rem 0 0.4rem;
+  }
+  .menu-card .desc { color: var(--ink-soft); font-size: 0.95rem; }
+  .menu-card .progress-stars {
+    position: absolute; top: 1.4rem; right: 1.5rem;
+    color: var(--gold); font-size: 1.05rem; letter-spacing: 0.1em;
+  }
+
+  /* ── Settings ── */
+  .settings {
+    margin: 1.5rem 0 0; padding: 1rem 1.2rem;
+    background: var(--paper-soft); border: 1px solid var(--line);
+    border-radius: var(--radius); display: grid; gap: 0.75rem;
+  }
+  .settings h3 {
+    font-family: 'Fraunces', serif; font-weight: 500; margin: 0;
+    font-size: 1rem; color: var(--ink-soft);
+    text-transform: uppercase; letter-spacing: 0.12em;
+  }
+  .setting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.75rem; font-size: 0.95rem; flex-wrap: wrap;
+  }
+  .setting-row label { color: var(--ink); }
+  .toggle-group { display: inline-flex; gap: 0.4rem; flex-wrap: wrap; }
+  .pill {
+    background: transparent; border: 1px solid var(--line);
+    color: var(--ink); font-family: inherit; font-size: 0.9rem;
+    padding: 0.4rem 0.9rem; border-radius: 999px; cursor: pointer;
+    transition: all 0.15s; min-height: 44px;
+    display: inline-flex; align-items: center;
+  }
+  .pill.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .pill:hover:not(.active) { background: var(--paper); }
+
+  /* ── Reader area ── */
+  .reader {
+    margin: 1rem 0 1rem; min-height: 45vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start; gap: 1.25rem;
+  }
+
+  /* Syllable grid — 4 columns (less overwhelming) */
+  .syl-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 0.6rem; width: 100%;
+  }
+  @media (max-width: 480px) {
+    .syl-grid { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+  }
+
+  .tile {
+    background: var(--paper-soft); border: 1px solid var(--line);
+    border-radius: 12px; font-family: 'Lexend', sans-serif;
+    font-weight: 500; font-size: 1.7rem; color: var(--ink);
+    padding: 1.1rem 0.5rem; cursor: pointer; transition: all 0.15s;
+    text-align: center; user-select: none; min-height: 72px;
+  }
+  .tile:hover, .tile:active { background: var(--accent-soft); border-color: var(--accent); }
+  .tile.speaking { background: var(--highlight); border-color: var(--gold); }
+
+  /* Focus tile — single large syllable */
+  .focus-tile {
+    background: var(--paper-soft); border: 2px solid var(--line);
+    border-radius: 20px; font-family: 'Lexend', sans-serif;
+    font-weight: 600; font-size: 5rem; color: var(--ink);
+    padding: 2.5rem 3rem; cursor: pointer; transition: all 0.15s;
+    text-align: center; user-select: none; width: 100%;
+    min-height: 180px; display: flex; align-items: center; justify-content: center;
+  }
+  .focus-tile:hover, .focus-tile:active { background: var(--accent-soft); border-color: var(--accent); }
+  .focus-tile.speaking { background: var(--highlight); border-color: var(--gold); }
+
+  .group-label {
+    width: 100%; font-family: 'Fraunces', serif;
+    font-size: 0.85rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink-soft); border-bottom: 1px solid var(--line);
+    padding-bottom: 0.4rem; margin-top: 0.5rem;
+  }
+  .focus-counter {
+    font-family: 'Fraunces', serif; font-size: 1rem;
+    color: var(--ink-soft); text-align: center; width: 100%;
+  }
+
+  /* Word / sentence / story cards */
+  .word-card, .sentence-card, .story-card {
+    width: 100%; background: var(--paper-soft);
+    border: 1px solid var(--line); border-radius: var(--radius); padding: 2rem 1.5rem;
+  }
+  .word-display {
+    font-family: 'Lexend', sans-serif; font-weight: 500;
+    font-size: var(--reading-size); text-align: center;
+    line-height: 1.3; color: var(--ink); letter-spacing: 0.02em;
+  }
+  .syllable-sep { color: var(--ink-soft); font-weight: 400; margin: 0 0.05em; }
+  .clickable-word, .clickable-syllable {
+    cursor: pointer; padding: 0.05em 0.15em;
+    border-radius: 6px; transition: background 0.15s; display: inline-block;
+  }
+  .clickable-word:hover, .clickable-syllable:hover { background: var(--accent-soft); }
+  .clickable-word.speaking, .clickable-syllable.speaking { background: var(--highlight); }
+
+  .sentence-display {
+    font-family: 'Lexend', sans-serif; font-weight: 500;
+    font-size: calc(var(--reading-size) * 0.85);
+    text-align: center; line-height: 1.5; color: var(--ink);
+  }
+
+  .story-title {
+    font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 1.6rem; color: var(--ink); margin: 0 0 1.25rem; text-align: center;
+  }
+  .story-text {
+    font-family: 'Lexend', sans-serif; font-weight: 400;
+    font-size: calc(var(--reading-size) * 0.7); line-height: 1.7; color: var(--ink);
+  }
+  .story-text p { margin: 0 0 0.9rem; }
+
+  /* Navigation */
+  .nav-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.75rem; width: 100%; margin-top: 0.25rem;
+  }
+  .nav-btn {
+    background: var(--accent); color: white; border: none;
+    border-radius: 999px; padding: 0.85rem 1.6rem;
+    font-family: inherit; font-size: 1.05rem; cursor: pointer;
+    transition: background 0.15s; flex: 1; max-width: 180px; min-height: 52px;
+  }
+  .nav-btn:hover, .nav-btn:active { background: #3A5640; }
+  .nav-btn:disabled { background: var(--line); color: var(--ink-soft); cursor: not-allowed; }
+  .nav-btn.secondary {
+    background: transparent; color: var(--ink); border: 1px solid var(--line);
+  }
+  .nav-btn.secondary:hover, .nav-btn.secondary:active { background: var(--paper-soft); }
+
+  /* Repeat button — big, always visible, orange */
+  .repeat-btn {
+    width: 100%; background: var(--warn); color: white; border: none;
+    border-radius: 999px; padding: 1rem 1.8rem; font-family: inherit;
+    font-size: 1.15rem; font-weight: 500; cursor: pointer;
+    transition: background 0.15s; min-height: 58px;
+    margin: 0.25rem 0;
+  }
+  .repeat-btn:hover, .repeat-btn:active { background: #B26A3F; }
+
+  /* Progress dots */
+  .progress-dots {
+    display: flex; gap: 0.4rem; flex-wrap: wrap;
+    justify-content: center; margin: 0.25rem 0 0.75rem;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); transition: background 0.15s; }
+  .dot.done { background: var(--accent); }
+  .dot.current { background: var(--gold); transform: scale(1.4); }
+
+  /* Reward modal */
+  .reward {
+    position: fixed; inset: 0; background: rgba(42,34,24,0.4);
+    display: none; align-items: center; justify-content: center; z-index: 100; padding: 1rem;
+  }
+  .reward.show { display: flex; }
+  .reward-card {
+    background: var(--paper); border-radius: var(--radius);
+    padding: 2.5rem 2rem; max-width: 360px; text-align: center;
+    border: 1px solid var(--line); animation: pop 0.4s ease-out;
+  }
+  .reward-stars { font-family: 'Fraunces', serif; font-size: 3rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+  .reward-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 1.6rem; margin: 0 0 0.6rem; }
+  .reward-text { color: var(--ink-soft); margin-bottom: 1.5rem; }
+
+  /* Break modal */
+  .break-modal {
+    position: fixed; inset: 0; background: rgba(42,34,24,0.55);
+    display: none; align-items: center; justify-content: center; z-index: 110; padding: 1rem;
+  }
+  .break-modal.show { display: flex; }
+  .break-card {
+    background: var(--paper); border-radius: var(--radius);
+    padding: 2.5rem 2rem; max-width: 360px; text-align: center;
+    border: 1px solid var(--line); animation: pop 0.4s ease-out;
+  }
+  .break-icon { font-family: 'Fraunces', serif; font-size: 2.8rem; color: var(--accent); margin-bottom: 0.5rem; }
+  .break-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 1.6rem; margin: 0 0 0.6rem; }
+  .break-text { color: var(--ink-soft); margin-bottom: 1.5rem; }
+
+  /* Floating micro-reward star */
+  .micro-star {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Fraunces', serif; font-size: 5rem; color: var(--gold);
+    pointer-events: none; animation: micro-fly 1.4s ease-out forwards;
+    z-index: 200; user-select: none;
+  }
+  @keyframes micro-fly {
+    0%   { opacity: 1; transform: translate(-50%, -50%) scale(0.6); }
+    25%  { opacity: 1; transform: translate(-50%, -65%) scale(1.3); }
+    100% { opacity: 0; transform: translate(-50%, -130%) scale(0.9); }
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Voice notice */
+  .voice-notice {
+    background: #FCF3E0; border: 1px solid #E8D9B0; color: #6B5320;
+    padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.9rem;
+    margin-bottom: 1rem; display: none;
+  }
+  .voice-notice.show { display: block; }
+
+  .hidden { display: none !important; }
+
+  body[data-size="small"]  { --reading-size: 1.9rem; }
+  body[data-size="medium"] { --reading-size: 2.4rem; }
+  body[data-size="large"]  { --reading-size: 3rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body data-size="medium">
+<div class="wrap">
+
+  <header class="bar">
+    <div class="brand">Čtení • krok za krokem</div>
+    <button class="home-btn hidden" id="homeBtn" aria-label="Zpět domů">← Domů</button>
+    <div class="stars-row" id="totalStars" aria-label="Hvězdičky"></div>
+  </header>
+
+  <!-- HOME -->
+  <section id="view-home">
+    <h1 class="section-title">Ahoj!</h1>
+    <p class="section-sub">Vyber si, co budeš dnes číst.</p>
+
+    <div class="voice-notice" id="voiceNotice">
+      Pozn.: tvůj prohlížeč nemá český hlas. Čtení nahlas nemusí znít hezky. Klikat na slova ale stále jde.
+    </div>
+
+    <div class="menu">
+      <button class="menu-card" data-target="syllables">
+        <div class="num">1 / 4</div>
+        <div class="title">Slabiky</div>
+        <div class="desc">ma · me · mi · mo · mu</div>
+        <div class="progress-stars" data-progress="syllables"></div>
+      </button>
+      <button class="menu-card" data-target="words">
+        <div class="num">2 / 4</div>
+        <div class="title">Slova</div>
+        <div class="desc">má · ma → máma</div>
+        <div class="progress-stars" data-progress="words"></div>
+      </button>
+      <button class="menu-card" data-target="sentences">
+        <div class="num">3 / 4</div>
+        <div class="title">Věty</div>
+        <div class="desc">Táta má kolo.</div>
+        <div class="progress-stars" data-progress="sentences"></div>
+      </button>
+      <button class="menu-card" data-target="stories">
+        <div class="num">4 / 4</div>
+        <div class="title">Krátké pohádky</div>
+        <div class="desc">Pár vět dohromady.</div>
+        <div class="progress-stars" data-progress="stories"></div>
+      </button>
+    </div>
+
+    <div class="settings">
+      <h3>Nastavení</h3>
+      <div class="setting-row">
+        <label>Velikost písma</label>
+        <div class="toggle-group" id="sizeToggle">
+          <button class="pill" data-size="small">malé</button>
+          <button class="pill active" data-size="medium">střední</button>
+          <button class="pill" data-size="large">velké</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label>Oddělovat slabiky</label>
+        <div class="toggle-group" id="syllableToggle">
+          <button class="pill active" data-syl="on">ano</button>
+          <button class="pill" data-syl="off">ne</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label>Číst nahlas</label>
+        <div class="toggle-group" id="speechToggle">
+          <button class="pill active" data-speech="on">zapnuto</button>
+          <button class="pill" data-speech="off">vypnuto</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label>Rychlost čtení</label>
+        <div class="toggle-group" id="rateToggle">
+          <button class="pill" data-rate="0.7">pomalu</button>
+          <button class="pill active" data-rate="0.85">normálně</button>
+          <button class="pill" data-rate="1">rychle</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label title="Automaticky přečte slovo/větu při přechodu na další">Auto-čtení</label>
+        <div class="toggle-group" id="autoSpeakToggle">
+          <button class="pill active" data-autospeak="on">zapnuto</button>
+          <button class="pill" data-autospeak="off">vypnuto</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label title="Slabiky zobrazuje jednu po druhé — méně rušivé">Fokus mód</label>
+        <div class="toggle-group" id="focusToggle">
+          <button class="pill active" data-focus="on">zapnuto</button>
+          <button class="pill" data-focus="off">vypnuto</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label title="Připomene přestávku po nastaveném počtu kroků">Přestávka</label>
+        <div class="toggle-group" id="breakToggle">
+          <button class="pill" data-break="0">vypnuto</button>
+          <button class="pill active" data-break="5">po 5</button>
+          <button class="pill" data-break="10">po 10</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <label>Vynulovat hvězdičky</label>
+        <button class="pill" id="resetStars">vynulovat</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SYLLABLES -->
+  <section id="view-syllables" class="hidden">
+    <h1 class="section-title">Slabiky</h1>
+    <p class="section-sub" id="sylSub"></p>
+    <div class="progress-dots" id="sylDots"></div>
+    <div class="reader" id="sylReader"></div>
+    <button class="repeat-btn" id="sylRepeat">Zopakovat</button>
+    <div class="nav-row">
+      <button class="nav-btn secondary" id="sylPrev">← Předchozí</button>
+      <button class="nav-btn" id="sylNext">Další →</button>
+    </div>
+  </section>
+
+  <!-- WORDS -->
+  <section id="view-words" class="hidden">
+    <h1 class="section-title">Slova</h1>
+    <p class="section-sub">Klikni na slabiku. Pak na celé slovo.</p>
+    <div class="progress-dots" id="wordDots"></div>
+    <div class="reader">
+      <div class="word-card">
+        <div class="word-display" id="wordDisplay"></div>
+      </div>
+    </div>
+    <button class="repeat-btn" id="wordRepeat">Zopakovat</button>
+    <div class="nav-row">
+      <button class="nav-btn secondary" id="wordPrev">← Předchozí</button>
+      <button class="nav-btn" id="wordNext">Další →</button>
+    </div>
+  </section>
+
+  <!-- SENTENCES -->
+  <section id="view-sentences" class="hidden">
+    <h1 class="section-title">Věty</h1>
+    <p class="section-sub">Klikni na slovo. Pak zkus celou větu.</p>
+    <div class="progress-dots" id="sentDots"></div>
+    <div class="reader">
+      <div class="sentence-card">
+        <div class="sentence-display" id="sentenceDisplay"></div>
+      </div>
+    </div>
+    <button class="repeat-btn" id="sentRepeat">Zopakovat větu</button>
+    <div class="nav-row">
+      <button class="nav-btn secondary" id="sentPrev">← Předchozí</button>
+      <button class="nav-btn" id="sentNext">Další →</button>
+    </div>
+  </section>
+
+  <!-- STORIES -->
+  <section id="view-stories" class="hidden">
+    <h1 class="section-title">Krátké pohádky</h1>
+    <p class="section-sub">Klikni na slovo. Nebo si nech přečíst celou pohádku.</p>
+    <div class="progress-dots" id="storyDots"></div>
+    <div class="reader">
+      <div class="story-card">
+        <h2 class="story-title" id="storyTitle"></h2>
+        <div class="story-text" id="storyText"></div>
+      </div>
+    </div>
+    <button class="repeat-btn" id="storyRepeat">Zopakovat pohádku</button>
+    <div class="nav-row">
+      <button class="nav-btn secondary" id="storyPrev">← Předchozí</button>
+      <button class="nav-btn" id="storyNext">Další →</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- Reward overlay -->
+<div class="reward" id="reward" role="dialog" aria-modal="true">
+  <div class="reward-card">
+    <div class="reward-stars">★ ★ ★</div>
+    <h2 class="reward-title" id="rewardTitle">Skvělá práce!</h2>
+    <p class="reward-text" id="rewardText"></p>
+    <button class="nav-btn" id="rewardClose">Pokračovat</button>
+  </div>
+</div>
+
+<!-- Break overlay -->
+<div class="break-modal" id="breakModal" role="dialog" aria-modal="true">
+  <div class="break-card">
+    <div class="break-icon">★ ★ ★</div>
+    <h2 class="break-title">Čas na přestávku!</h2>
+    <p class="break-text">Udělej si chvilku pauzu. Protáhni se, napij se vody.</p>
+    <button class="nav-btn" id="breakClose">Jsem připraven!</button>
+  </div>
+</div>
+
+<script>
+/* ════ CONTENT ════ */
+
+const SYLLABLE_GROUPS = [
+  { label: 'M', items: ['má','ma','mé','me','mí','mi','mo','mů','mu'] },
+  { label: 'L', items: ['lá','la','lé','le','lí','li','lo','lů','lu'] },
+  { label: 'S', items: ['sa','se','si','so','su','sá','sé','sí','sů'] },
+  { label: 'P', items: ['pa','pe','pi','po','pu','pá','pé','pí','pů'] },
+  { label: 'T', items: ['ta','te','ti','to','tu','tá','té','tí','tů'] },
+  { label: 'V', items: ['va','ve','vi','vo','vu','vá','vé','ví','vů'] },
+  { label: 'B', items: ['ba','be','bi','bo','bu','bá','bé','bí','bů'] },
+  { label: 'N', items: ['na','ne','ni','no','nu','ná','né','ní','nů'] },
+  { label: 'D', items: ['da','de','di','do','du','dá','dé','dí','dů'] },
+  { label: 'K', items: ['ka','ke','ki','ko','ku','ká','ké','kí','ků'] },
+  { label: 'J', items: ['ja','je','ji','jo','ju','já','jé','jí','jů'] },
+  { label: 'R', items: ['ra','re','ri','ro','ru','rá','ré','rí','rů'] },
+];
+
+const WORDS = [
+  ['má','ma'], ['tá','ta'], ['ba','ba'], ['bá','ba'],
+  ['Ema'], ['Eva'],
+  ['mí','sa'], ['vá','za'], ['vo','da'], ['no','ha'],
+  ['so','va'], ['vo','sa'], ['ko','sa'], ['lu','pa'],
+  ['ko','lo'], ['po','le'], ['se','lo'], ['te','le'],
+  ['me','le'], ['ve','de'], ['vi','dí'], ['se','dí'],
+  ['má','má'], ['tá','ta'],
+  ['má','me'], ['te','le','tu'],
+  ['ma','so'], ['le','to'], ['ji','dlo'],
+];
+
+const SENTENCES = [
+  'Máma má mísu.',
+  'Táta má kolo.',
+  'Kolo má dvě kola.',
+  'Bába mele maso.',
+  'Vosa vidí sovu.',
+  'Sova sedí na poli.',
+  'Eva má vázu.',
+  'Máma vidí tátu.',
+  'Léto je teplé.',
+  'Pes leze do boudy.',
+  'Táta jede na kole.',
+  'Eva má malé kolo.',
+];
+
+const STORIES = [
+  {
+    title: 'O kole',
+    paragraphs: [
+      'Táta má kolo. Kolo je velké.',
+      'Kolo má dvě kola. Táta jede na kole.',
+      'Eva vidí tátu. Eva má malé kolo.',
+      'Eva jede s tátou. Je to fajn.',
+    ]
+  },
+  {
+    title: 'Sova a vosa',
+    paragraphs: [
+      'Sova sedí na poli. Vosa letí kolem.',
+      'Vosa vidí sovu. Sova vidí vosu.',
+      'Sova letí domů. Vosa letí domů.',
+      'Je večer. Je ticho.',
+    ]
+  },
+  {
+    title: 'Máma mele',
+    paragraphs: [
+      'Máma mele maso. Máma má mísu.',
+      'V míse je maso. Táta jí maso.',
+      'Eva jí maso. Pes vidí maso.',
+      'Pes čeká. Máma dá psovi kost.',
+      'Pes je rád.',
+    ]
+  },
+];
+
+/* ════ STATE ════ */
+
+const state = {
+  view: 'home',
+  sylIdx: 0, sylItemIdx: 0,
+  wordIdx: 0, sentIdx: 0, storyIdx: 0,
+  size: 'medium', syllables: 'on', speech: 'on', rate: 0.85,
+  autoSpeak: 'on', focusMode: 'on', breakAfter: 5,
+  sessionItems: 0,
+  progress: { syllables: 0, words: 0, sentences: 0, stories: 0 },
+  totalStars: 0,
+  voice: null,
+};
+
+/* ════ STORAGE (localStorage) ════ */
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('settings');
+    if (s) {
+      const p = JSON.parse(s);
+      state.size      = p.size      || 'medium';
+      state.syllables = p.syllables || 'on';
+      state.speech    = p.speech    || 'on';
+      state.rate      = p.rate      || 0.85;
+      state.autoSpeak = p.autoSpeak !== undefined ? p.autoSpeak : 'on';
+      state.focusMode = p.focusMode !== undefined ? p.focusMode : 'on';
+      state.breakAfter= p.breakAfter !== undefined ? p.breakAfter : 5;
+    }
+  } catch(e) {}
+  try {
+    const pr = localStorage.getItem('progress');
+    if (pr) state.progress = { ...state.progress, ...JSON.parse(pr) };
+  } catch(e) {}
+  state.totalStars = Object.values(state.progress).reduce((a,b) => a+b, 0);
+}
+
+function saveSettings() {
+  try {
+    localStorage.setItem('settings', JSON.stringify({
+      size: state.size, syllables: state.syllables,
+      speech: state.speech, rate: state.rate,
+      autoSpeak: state.autoSpeak, focusMode: state.focusMode,
+      breakAfter: state.breakAfter,
+    }));
+  } catch(e) {}
+}
+
+function saveProgress() {
+  try { localStorage.setItem('progress', JSON.stringify(state.progress)); } catch(e) {}
+}
+
+/* ════ SPEECH ════ */
+
+function loadVoices() {
+  const voices = window.speechSynthesis.getVoices();
+  const cz = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('cs'));
+  state.voice = cz || null;
+  document.getElementById('voiceNotice').classList.toggle('show', !cz);
+}
+
+function speak(text, el) {
+  if (state.speech === 'off' || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'cs-CZ';
+  if (state.voice) u.voice = state.voice;
+  u.rate = state.rate; u.pitch = 1;
+  if (el) {
+    el.classList.add('speaking');
+    u.onend  = () => el.classList.remove('speaking');
+    u.onerror= () => el.classList.remove('speaking');
+  }
+  window.speechSynthesis.speak(u);
+}
+
+function speakSequence(items) {
+  if (state.speech === 'off' || !('speechSynthesis' in window)) return;
+  let i = 0;
+  function next() {
+    if (i >= items.length) return;
+    const { text, el } = items[i++];
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'cs-CZ';
+    if (state.voice) u.voice = state.voice;
+    u.rate = state.rate;
+    if (el) {
+      el.classList.add('speaking');
+      u.onend  = () => { el.classList.remove('speaking'); next(); };
+      u.onerror= () => { el.classList.remove('speaking'); next(); };
+    } else { u.onend = next; u.onerror = next; }
+    window.speechSynthesis.speak(u);
+  }
+  window.speechSynthesis.cancel();
+  next();
+}
+
+/* ════ MICRO-REWARD & BREAK ════ */
+
+function microReward() {
+  const el = document.createElement('div');
+  el.className = 'micro-star';
+  el.textContent = '★';
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+
+function tickItem() {
+  state.sessionItems++;
+  if (state.sessionItems % 5 === 0) microReward();
+  if (state.breakAfter > 0 && state.sessionItems % state.breakAfter === 0) showBreak();
+}
+
+function showBreak() {
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  document.getElementById('breakModal').classList.add('show');
+}
+
+document.getElementById('breakClose').addEventListener('click', () => {
+  document.getElementById('breakModal').classList.remove('show');
+});
+
+/* ════ VIEW ROUTING ════ */
+
+function show(view) {
+  state.view = view;
+  ['home','syllables','words','sentences','stories'].forEach(v =>
+    document.getElementById('view-'+v).classList.toggle('hidden', v !== view)
+  );
+  document.getElementById('homeBtn').classList.toggle('hidden', view === 'home');
+  if (view === 'syllables') renderSyllables(true);
+  if (view === 'words')     renderWord(true);
+  if (view === 'sentences') renderSentence(true);
+  if (view === 'stories')   renderStory(true);
+  if (view === 'home')      renderHome();
+  window.scrollTo(0, 0);
+}
+
+/* ════ HOME ════ */
+
+function renderHome() {
+  const t = document.getElementById('totalStars');
+  t.textContent = state.totalStars > 0 ? '★ ' + state.totalStars : '';
+  document.querySelectorAll('[data-progress]').forEach(el => {
+    const n = state.progress[el.getAttribute('data-progress')] || 0;
+    el.textContent = n > 0 ? '★ ' + n : '';
+  });
+}
+
+/* ════ SYLLABLES ════ */
+
+function renderSyllables(autoplay = false) {
+  const reader = document.getElementById('sylReader');
+  const dots   = document.getElementById('sylDots');
+  reader.innerHTML = ''; dots.innerHTML = '';
+
+  SYLLABLE_GROUPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < state.sylIdx ? ' done' : '') + (i === state.sylIdx ? ' current' : '');
+    dots.appendChild(d);
+  });
+
+  const group = SYLLABLE_GROUPS[state.sylIdx];
+
+  if (state.focusMode === 'on') {
+    document.getElementById('sylSub').textContent = 'Klikni na slabiku — uslyšíš ji.';
+
+    const label = document.createElement('div');
+    label.className = 'group-label';
+    label.textContent = 'Skupina ' + group.label;
+    reader.appendChild(label);
+
+    const counter = document.createElement('div');
+    counter.className = 'focus-counter';
+    counter.textContent = (state.sylItemIdx + 1) + ' / ' + group.items.length;
+    reader.appendChild(counter);
+
+    const syl = group.items[state.sylItemIdx];
+    const tile = document.createElement('button');
+    tile.className = 'focus-tile';
+    tile.textContent = syl;
+    tile.setAttribute('aria-label', 'Přečíst slabiku ' + syl);
+    tile.addEventListener('click', () => speak(syl, tile));
+    reader.appendChild(tile);
+
+    if (autoplay && state.autoSpeak === 'on') speak(syl, tile);
+
+  } else {
+    document.getElementById('sylSub').textContent = 'Klikni na slabiku — uslyšíš ji. Přejdi šipkou na další skupinu.';
+
+    const label = document.createElement('div');
+    label.className = 'group-label';
+    label.textContent = 'Skupina ' + group.label;
+    reader.appendChild(label);
+
+    const grid = document.createElement('div');
+    grid.className = 'syl-grid';
+    group.items.forEach(s => {
+      const t = document.createElement('button');
+      t.className = 'tile'; t.textContent = s;
+      t.addEventListener('click', () => speak(s, t));
+      grid.appendChild(t);
+    });
+    reader.appendChild(grid);
+  }
+
+  const atStart = state.sylIdx === 0 && (state.focusMode === 'off' || state.sylItemIdx === 0);
+  document.getElementById('sylPrev').disabled = atStart;
+
+  const atEnd = state.sylIdx === SYLLABLE_GROUPS.length - 1 &&
+    (state.focusMode === 'off' || state.sylItemIdx === SYLLABLE_GROUPS[state.sylIdx].items.length - 1);
+  document.getElementById('sylNext').textContent = atEnd ? 'Hotovo ★' : 'Další →';
+}
+
+document.getElementById('sylRepeat').addEventListener('click', () => {
+  if (state.focusMode === 'on') {
+    const tile = document.querySelector('#sylReader .focus-tile');
+    if (tile) speak(SYLLABLE_GROUPS[state.sylIdx].items[state.sylItemIdx], tile);
+  } else {
+    const tiles = document.querySelectorAll('#sylReader .tile');
+    speakSequence(Array.from(tiles).map(t => ({ text: t.textContent, el: t })));
+  }
+});
+
+document.getElementById('sylPrev').addEventListener('click', () => {
+  if (state.focusMode === 'on') {
+    if (state.sylItemIdx > 0) {
+      state.sylItemIdx--;
+    } else if (state.sylIdx > 0) {
+      state.sylIdx--;
+      state.sylItemIdx = SYLLABLE_GROUPS[state.sylIdx].items.length - 1;
+    }
+  } else {
+    if (state.sylIdx > 0) state.sylIdx--;
+  }
+  renderSyllables(true);
+});
+
+document.getElementById('sylNext').addEventListener('click', () => {
+  const group = SYLLABLE_GROUPS[state.sylIdx];
+  tickItem();
+  if (state.focusMode === 'on') {
+    if (state.sylItemIdx < group.items.length - 1) {
+      state.sylItemIdx++;
+      renderSyllables(true);
+    } else if (state.sylIdx < SYLLABLE_GROUPS.length - 1) {
+      state.sylIdx++; state.sylItemIdx = 0;
+      renderSyllables(true);
+    } else {
+      completeSection('syllables', 'Slabiky hotovo!', 'Dokončil jsi všechny skupiny slabik.');
+      state.sylIdx = 0; state.sylItemIdx = 0;
+    }
+  } else {
+    if (state.sylIdx < SYLLABLE_GROUPS.length - 1) {
+      state.sylIdx++;
+      renderSyllables(true);
+    } else {
+      completeSection('syllables', 'Slabiky hotovo!', 'Dokončil jsi všechny skupiny slabik.');
+      state.sylIdx = 0; state.sylItemIdx = 0;
+    }
+  }
+});
+
+/* ════ WORDS ════ */
+
+function renderWord(autoplay = false) {
+  const display = document.getElementById('wordDisplay');
+  const dots    = document.getElementById('wordDots');
+  dots.innerHTML = '';
+  WORDS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < state.wordIdx ? ' done' : '') + (i === state.wordIdx ? ' current' : '');
+    dots.appendChild(d);
+  });
+
+  display.innerHTML = '';
+  const word     = WORDS[state.wordIdx];
+  const fullText = word.join('');
+
+  if (state.syllables === 'on' && word.length > 1) {
+    word.forEach((syl, i) => {
+      const span = document.createElement('span');
+      span.className = 'clickable-syllable';
+      span.textContent = syl;
+      span.addEventListener('click', e => { e.stopPropagation(); speak(syl, span); });
+      display.appendChild(span);
+      if (i < word.length - 1) {
+        const sep = document.createElement('span');
+        sep.className = 'syllable-sep'; sep.textContent = '·';
+        display.appendChild(sep);
+      }
+    });
+  } else {
+    const span = document.createElement('span');
+    span.className = 'clickable-word'; span.textContent = fullText;
+    span.addEventListener('click', () => speak(fullText, span));
+    display.appendChild(span);
+  }
+
+  if (autoplay && state.autoSpeak === 'on') speak(fullText, display);
+
+  document.getElementById('wordPrev').disabled = state.wordIdx === 0;
+  document.getElementById('wordNext').textContent =
+    state.wordIdx === WORDS.length - 1 ? 'Hotovo ★' : 'Další →';
+}
+
+document.getElementById('wordRepeat').addEventListener('click', () => {
+  speak(WORDS[state.wordIdx].join(''), document.getElementById('wordDisplay'));
+});
+
+document.getElementById('wordPrev').addEventListener('click', () => {
+  if (state.wordIdx > 0) { state.wordIdx--; renderWord(true); }
+});
+document.getElementById('wordNext').addEventListener('click', () => {
+  tickItem();
+  if (state.wordIdx < WORDS.length - 1) {
+    state.wordIdx++; renderWord(true);
+  } else {
+    completeSection('words', 'Slova hotovo!', 'Přečetl jsi všechna slova.');
+    state.wordIdx = 0;
+  }
+});
+
+/* ════ SENTENCES ════ */
+
+function renderSentence(autoplay = false) {
+  const display = document.getElementById('sentenceDisplay');
+  const dots    = document.getElementById('sentDots');
+  dots.innerHTML = '';
+  SENTENCES.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < state.sentIdx ? ' done' : '') + (i === state.sentIdx ? ' current' : '');
+    dots.appendChild(d);
+  });
+
+  display.innerHTML = '';
+  const sentence = SENTENCES[state.sentIdx];
+  sentence.split(/(\s+)/).forEach(w => {
+    if (/^\s+$/.test(w)) {
+      display.appendChild(document.createTextNode(' '));
+    } else {
+      const span = document.createElement('span');
+      span.className = 'clickable-word'; span.textContent = w;
+      span.addEventListener('click', () => speak(w.replace(/[.,!?;:]/g, ''), span));
+      display.appendChild(span);
+    }
+  });
+
+  if (autoplay && state.autoSpeak === 'on') speak(sentence, display);
+
+  document.getElementById('sentPrev').disabled = state.sentIdx === 0;
+  document.getElementById('sentNext').textContent =
+    state.sentIdx === SENTENCES.length - 1 ? 'Hotovo ★' : 'Další →';
+}
+
+document.getElementById('sentRepeat').addEventListener('click', () => {
+  speak(SENTENCES[state.sentIdx], document.getElementById('sentenceDisplay'));
+});
+
+document.getElementById('sentPrev').addEventListener('click', () => {
+  if (state.sentIdx > 0) { state.sentIdx--; renderSentence(true); }
+});
+document.getElementById('sentNext').addEventListener('click', () => {
+  tickItem();
+  if (state.sentIdx < SENTENCES.length - 1) {
+    state.sentIdx++; renderSentence(true);
+  } else {
+    completeSection('sentences', 'Věty hotovo!', 'Přečetl jsi všechny věty.');
+    state.sentIdx = 0;
+  }
+});
+
+/* ════ STORIES ════ */
+
+function renderStory(autoplay = false) {
+  const titleEl = document.getElementById('storyTitle');
+  const textEl  = document.getElementById('storyText');
+  const dots    = document.getElementById('storyDots');
+  dots.innerHTML = '';
+  STORIES.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < state.storyIdx ? ' done' : '') + (i === state.storyIdx ? ' current' : '');
+    dots.appendChild(d);
+  });
+
+  const story = STORIES[state.storyIdx];
+  titleEl.textContent = story.title;
+  titleEl.style.cursor = 'pointer';
+  titleEl.onclick = () => speak(story.title, titleEl);
+
+  textEl.innerHTML = '';
+  story.paragraphs.forEach(p => {
+    const pEl = document.createElement('p');
+    p.split(/(\s+)/).forEach(w => {
+      if (/^\s+$/.test(w)) {
+        pEl.appendChild(document.createTextNode(' '));
+      } else {
+        const span = document.createElement('span');
+        span.className = 'clickable-word'; span.textContent = w;
+        span.addEventListener('click', () => speak(w.replace(/[.,!?;:"]/g, ''), span));
+        pEl.appendChild(span);
+      }
+    });
+    textEl.appendChild(pEl);
+  });
+
+  if (autoplay && state.autoSpeak === 'on') speak(story.title, titleEl);
+
+  document.getElementById('storyPrev').disabled = state.storyIdx === 0;
+  document.getElementById('storyNext').textContent =
+    state.storyIdx === STORIES.length - 1 ? 'Hotovo ★' : 'Další →';
+}
+
+document.getElementById('storyRepeat').addEventListener('click', () => {
+  const story = STORIES[state.storyIdx];
+  speak(story.title + '. ' + story.paragraphs.join(' '), document.getElementById('storyTitle'));
+});
+
+document.getElementById('storyPrev').addEventListener('click', () => {
+  if (state.storyIdx > 0) { state.storyIdx--; renderStory(true); }
+});
+document.getElementById('storyNext').addEventListener('click', () => {
+  tickItem();
+  if (state.storyIdx < STORIES.length - 1) {
+    state.storyIdx++; renderStory(true);
+  } else {
+    completeSection('stories', 'Pohádky hotovo!', 'Přečetl jsi všechny pohádky.');
+    state.storyIdx = 0;
+  }
+});
+
+/* ════ REWARD ════ */
+
+function completeSection(key, title, text) {
+  state.progress[key] = (state.progress[key] || 0) + 1;
+  state.totalStars = Object.values(state.progress).reduce((a,b) => a+b, 0);
+  saveProgress();
+  document.getElementById('rewardTitle').textContent = title;
+  document.getElementById('rewardText').textContent  = text;
+  document.getElementById('reward').classList.add('show');
+}
+
+document.getElementById('rewardClose').addEventListener('click', () => {
+  document.getElementById('reward').classList.remove('show');
+  show('home');
+});
+
+/* ════ NAVIGATION & SETTINGS ════ */
+
+document.querySelectorAll('.menu-card').forEach(card =>
+  card.addEventListener('click', () => show(card.getAttribute('data-target')))
+);
+document.getElementById('homeBtn').addEventListener('click', () => {
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  show('home');
+});
+
+function bindToggle(groupId, attr, stateKey, onChange) {
+  document.querySelectorAll('#' + groupId + ' .pill').forEach(p => {
+    p.addEventListener('click', () => {
+      document.querySelectorAll('#' + groupId + ' .pill').forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+      state[stateKey] = attr === 'float' ? parseFloat(p.getAttribute('data-' + stateKey))
+                      : attr === 'int'   ? parseInt(p.getAttribute('data-' + stateKey))
+                      : p.getAttribute('data-' + stateKey);
+      saveSettings();
+      if (onChange) onChange();
+    });
+  });
+}
+
+bindToggle('sizeToggle', 'str', 'size', () => document.body.setAttribute('data-size', state.size));
+bindToggle('syllableToggle', 'str', 'syllables', () => { if (state.view === 'words') renderWord(); });
+bindToggle('speechToggle', 'str', 'speech', () => {
+  if (state.speech === 'off') window.speechSynthesis && window.speechSynthesis.cancel();
+});
+bindToggle('rateToggle', 'float', 'rate', null);
+bindToggle('autoSpeakToggle', 'str', 'autoSpeak', null);
+bindToggle('focusToggle', 'str', 'focusMode', () => { if (state.view === 'syllables') renderSyllables(); });
+bindToggle('breakToggle', 'int', 'breakAfter', null);
+
+document.getElementById('resetStars').addEventListener('click', () => {
+  state.progress = { syllables: 0, words: 0, sentences: 0, stories: 0 };
+  state.totalStars = 0;
+  saveProgress();
+  renderHome();
+});
+
+/* ════ INIT ════ */
+
+function init() {
+  loadState();
+  document.body.setAttribute('data-size', state.size);
+
+  const applyToggle = (groupId, dataAttr, value, parse) =>
+    document.querySelectorAll('#' + groupId + ' .pill').forEach(p =>
+      p.classList.toggle('active', (parse ? parse(p.getAttribute(dataAttr)) : p.getAttribute(dataAttr)) === value)
+    );
+
+  applyToggle('sizeToggle',      'data-size',      state.size);
+  applyToggle('syllableToggle',  'data-syl',       state.syllables);
+  applyToggle('speechToggle',    'data-speech',    state.speech);
+  applyToggle('rateToggle',      'data-rate',      state.rate,       parseFloat);
+  applyToggle('autoSpeakToggle', 'data-autospeak', state.autoSpeak);
+  applyToggle('focusToggle',     'data-focus',     state.focusMode);
+  applyToggle('breakToggle',     'data-break',     state.breakAfter, parseInt);
+
+  if ('speechSynthesis' in window) {
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  } else {
+    const n = document.getElementById('voiceNotice');
+    n.textContent = 'Tvůj prohlížeč nepodporuje čtení nahlas. Klikat na slova ale stále jde.';
+    n.classList.add('show');
+  }
+
+  show('home');
+}
+
+init();
+</script>
+</body>
+</html>

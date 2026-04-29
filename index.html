@@ -319,6 +319,65 @@
   @media (prefers-reduced-motion: reduce) {
     * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   }
+
+  /* ── Math section ── */
+  .math-mode-row {
+    display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.75rem;
+  }
+  .sym-pick-row {
+    display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1rem;
+  }
+  .sym-pick-row label { font-size: 0.9rem; color: var(--ink-soft); }
+  .sym-pick {
+    background: var(--paper-soft); border: 2px solid var(--line);
+    border-radius: 10px; font-size: 1.5rem; padding: 0.3rem 0.65rem;
+    cursor: pointer; transition: all 0.15s; min-height: 44px;
+    display: inline-flex; align-items: center;
+  }
+  .sym-pick.active { border-color: var(--accent); background: var(--accent-soft); }
+
+  .math-card {
+    width: 100%; background: var(--paper-soft); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 2rem 1.5rem; text-align: center;
+  }
+  .math-label {
+    font-family: 'Lexend', sans-serif; font-weight: 600;
+    font-size: 2.8rem; color: var(--ink); margin-bottom: 1.25rem;
+    letter-spacing: 0.05em;
+  }
+  .math-sym-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0.6rem; flex-wrap: wrap;
+  }
+  .sym-group {
+    display: inline-block; text-align: center;
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 8px; padding: 0.4rem 0.7rem; line-height: 1.5;
+    max-width: 160px;
+  }
+  .sym { font-size: 1.25rem; }
+  .math-op { font-size: 1.6rem; font-weight: 600; color: var(--ink-soft); }
+  .math-qmark { font-size: 2rem; font-weight: 700; color: var(--accent); }
+
+  .math-answers {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0.75rem; margin-top: 1.25rem; width: 100%;
+  }
+  .math-answer {
+    background: var(--paper-soft); border: 2px solid var(--line);
+    border-radius: var(--radius); font-family: 'Lexend', sans-serif;
+    font-weight: 600; font-size: 2rem; color: var(--ink);
+    padding: 1rem; cursor: pointer; transition: all 0.15s; min-height: 80px;
+  }
+  .math-answer:hover:not(:disabled) { background: var(--accent-soft); border-color: var(--accent); }
+  .math-answer.correct { background: #D4EDDA; border-color: #28A745; color: #155724; }
+  .math-answer.wrong   { background: #F8D7DA; border-color: #DC3545; color: #721C24; }
+  .math-answer:disabled { cursor: not-allowed; }
+  .math-streak {
+    text-align: center; font-family: 'Fraunces', serif;
+    font-size: 0.95rem; color: var(--gold); min-height: 1.4rem;
+    margin-bottom: 0.25rem;
+  }
 </style>
 </head>
 <body data-size="medium">
@@ -341,28 +400,34 @@
 
     <div class="menu">
       <button class="menu-card" data-target="syllables">
-        <div class="num">1 / 4</div>
+        <div class="num">1 / 5</div>
         <div class="title">Slabiky</div>
         <div class="desc">ma · me · mi · mo · mu</div>
         <div class="progress-stars" data-progress="syllables"></div>
       </button>
       <button class="menu-card" data-target="words">
-        <div class="num">2 / 4</div>
+        <div class="num">2 / 5</div>
         <div class="title">Slova</div>
         <div class="desc">ko · lo → kolo</div>
         <div class="progress-stars" data-progress="words"></div>
       </button>
       <button class="menu-card" data-target="sentences">
-        <div class="num">3 / 4</div>
+        <div class="num">3 / 5</div>
         <div class="title">Věty</div>
         <div class="desc">Táta má kolo.</div>
         <div class="progress-stars" data-progress="sentences"></div>
       </button>
       <button class="menu-card" data-target="stories">
-        <div class="num">4 / 4</div>
+        <div class="num">4 / 5</div>
         <div class="title">Krátké pohádky</div>
         <div class="desc">Pár vět dohromady.</div>
         <div class="progress-stars" data-progress="stories"></div>
+      </button>
+      <button class="menu-card" data-target="math">
+        <div class="num">5 / 5</div>
+        <div class="title">Počítání</div>
+        <div class="desc">3 + 4 = ?  &nbsp; ●●● + ●●●●</div>
+        <div class="progress-stars" data-progress="math"></div>
       </button>
     </div>
 
@@ -474,6 +539,35 @@
     </div>
   </section>
 
+  <!-- MATH -->
+  <section id="view-math" class="hidden">
+    <h1 class="section-title">Počítání</h1>
+
+    <div class="math-mode-row" id="mathModeRow">
+      <button class="pill active" data-mathmode="add">+ sčítání</button>
+      <button class="pill" data-mathmode="sub">− odčítání</button>
+      <button class="pill" data-mathmode="series">řady</button>
+      <button class="pill" data-mathmode="decomp">rozklad</button>
+    </div>
+
+    <div class="sym-pick-row">
+      <label>Symbol:</label>
+      <button class="sym-pick active" data-sym="●">●</button>
+      <button class="sym-pick" data-sym="★">★</button>
+      <button class="sym-pick" data-sym="♥">♥</button>
+      <button class="sym-pick" data-sym="☺">☺</button>
+    </div>
+
+    <div class="math-streak" id="mathStreak"></div>
+    <div class="progress-dots" id="mathDots"></div>
+    <div id="mathProblem"></div>
+    <div class="math-answers" id="mathAnswers"></div>
+
+    <div style="margin-top:1.25rem; text-align:center;">
+      <button class="nav-btn secondary" id="mathNewSet" style="max-width:100%;width:100%">Nová sada příkladů</button>
+    </div>
+  </section>
+
   <!-- STORIES -->
   <section id="view-stories" class="hidden">
     <h1 class="section-title">Krátké pohádky</h1>
@@ -542,6 +636,7 @@ const WORDS = [
   ['du','ha'],
   ['má','me'], ['pe','ro'],
   ['ma','so'], ['lé','to'], ['jí','dlo'],
+  ['au','to'],
 ];
 
 const WORD_PICS = {
@@ -555,10 +650,14 @@ const WORD_PICS = {
   'vede':8994,  'vidí':6564,  'sedí':11370,
   'duha':2986,  'máme':7271,  'pero':3246,
   'maso':2316,  'léto':5604,  'jídlo':4610,
+  'auto':2339,
 };
 
 const SENTENCES = [
   'Táta má kolo.',
+  'Táta má auto.',
+  'Táta jede autem.',
+  'Táta je bez auta.',
   'Kolo má dvě kola.',
   'Bába mele maso.',
   'Vosa vidí sovu.',
@@ -611,7 +710,8 @@ const state = {
   size: 'medium', syllables: 'on', speech: 'on', rate: 0.85,
   autoSpeak: 'on', focusMode: 'on', breakAfter: 5,
   sessionItems: 0,
-  progress: { syllables: 0, words: 0, sentences: 0, stories: 0 },
+  progress: { syllables: 0, words: 0, sentences: 0, stories: 0, math: 0 },
+  mathMode: 'add', mathSym: '●', mathIdx: 0, mathProblems: [], mathStreak: 0,
   totalStars: 0,
   voice: null,
 };
@@ -728,7 +828,7 @@ document.getElementById('breakClose').addEventListener('click', () => {
 
 function show(view) {
   state.view = view;
-  ['home','syllables','words','sentences','stories'].forEach(v =>
+  ['home','syllables','words','sentences','stories','math'].forEach(v =>
     document.getElementById('view-'+v).classList.toggle('hidden', v !== view)
   );
   document.getElementById('homeBtn').classList.toggle('hidden', view === 'home');
@@ -736,6 +836,7 @@ function show(view) {
   if (view === 'words')     renderWord(true);
   if (view === 'sentences') renderSentence(true);
   if (view === 'stories')   renderStory(true);
+  if (view === 'math')      { state.mathProblems = generateMathProblems(state.mathMode); state.mathIdx = 0; renderMath(); }
   if (view === 'home')      renderHome();
   window.scrollTo(0, 0);
 }
@@ -1048,6 +1149,183 @@ document.getElementById('storyNext').addEventListener('click', () => {
     completeSection('stories', 'Pohádky hotovo!', 'Přečetl jsi všechny pohádky.');
     state.storyIdx = 0;
   }
+});
+
+/* ════ MATH ════ */
+
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function makeOptions(answer) {
+  const pool = shuffle([...Array(16).keys()].filter(n => n !== answer));
+  // prefer nearby distractors
+  pool.sort((a, b) => Math.abs(a - answer) - Math.abs(b - answer));
+  return shuffle([answer, pool[0], pool[1], pool[2]]);
+}
+
+function generateMathProblems(mode) {
+  const problems = [];
+  let attempts = 0;
+  while (problems.length < 10 && attempts < 100) {
+    attempts++;
+    let p;
+    if (mode === 'add') {
+      const a = rand(1, 9), b = rand(1, Math.min(9, 15 - a));
+      p = { label: `${a} + ${b} = ?`, answer: a + b, symA: a, symB: b, op: '+' };
+    } else if (mode === 'sub') {
+      const ans = rand(1, 12), b = rand(1, Math.min(ans, 9));
+      const a = ans + b;
+      if (a > 15) continue;
+      p = { label: `${a} − ${b} = ?`, answer: ans, symA: a, symB: b, op: '−' };
+    } else if (mode === 'series') {
+      const step = rand(1, 3), start = rand(1, 5);
+      const nums = [0,1,2,3,4].map(i => start + i * step);
+      if (nums[4] > 15) continue;
+      const blankIdx = rand(1, 3);
+      const answer = nums[blankIdx];
+      const label = nums.map((n, i) => i === blankIdx ? '?' : n).join(', ');
+      p = { label, answer, symA: null };
+    } else {
+      const total = rand(4, 15), a = rand(1, total - 1);
+      p = { label: `${total} = ${a} + ?`, answer: total - a, symA: total, symB: a, op: 'decomp' };
+    }
+    p.options = makeOptions(p.answer);
+    problems.push(p);
+  }
+  return problems;
+}
+
+function symGroup(n) {
+  let html = '<span class="sym-group">';
+  for (let i = 0; i < n; i++) {
+    if (i > 0 && i % 5 === 0) html += '<br>';
+    html += `<span class="sym">${state.mathSym}</span>`;
+  }
+  return html + '</span>';
+}
+
+function renderMath() {
+  const problems = state.mathProblems;
+  if (!problems.length) return;
+  const p = problems[state.mathIdx];
+
+  // dots
+  const dots = document.getElementById('mathDots');
+  dots.innerHTML = '';
+  problems.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < state.mathIdx ? ' done' : '') + (i === state.mathIdx ? ' current' : '');
+    dots.appendChild(d);
+  });
+
+  // streak
+  document.getElementById('mathStreak').textContent =
+    state.mathStreak > 0 ? '★ '.repeat(Math.min(state.mathStreak, 5)).trim() : '';
+
+  // problem card
+  const container = document.getElementById('mathProblem');
+  container.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'math-card';
+
+  const lbl = document.createElement('div');
+  lbl.className = 'math-label';
+  lbl.textContent = p.label;
+  card.appendChild(lbl);
+
+  if (p.symA !== null) {
+    const row = document.createElement('div');
+    row.className = 'math-sym-row';
+    if (p.op === '+') {
+      row.innerHTML = symGroup(p.symA) +
+        '<span class="math-op">+</span>' + symGroup(p.symB) +
+        '<span class="math-op">=</span><span class="math-qmark">?</span>';
+    } else if (p.op === '−') {
+      row.innerHTML = symGroup(p.symA) +
+        '<span class="math-op">−</span>' + symGroup(p.symB) +
+        '<span class="math-op">=</span><span class="math-qmark">?</span>';
+    } else if (p.op === 'decomp') {
+      row.innerHTML = symGroup(p.symA) +
+        '<span class="math-op">=</span>' + symGroup(p.symB) +
+        '<span class="math-op">+</span><span class="math-qmark">?</span>';
+    }
+    card.appendChild(row);
+  }
+  container.appendChild(card);
+
+  // answer buttons
+  const ans = document.getElementById('mathAnswers');
+  ans.innerHTML = '';
+  p.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'math-answer';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => checkMathAnswer(opt, btn));
+    ans.appendChild(btn);
+  });
+}
+
+function checkMathAnswer(val, btn) {
+  const p = state.mathProblems[state.mathIdx];
+  document.querySelectorAll('.math-answer').forEach(b => b.disabled = true);
+
+  if (val === p.answer) {
+    btn.classList.add('correct');
+    state.mathStreak++;
+    speak(String(val));
+    tickItem();
+    setTimeout(() => {
+      if (state.mathIdx < state.mathProblems.length - 1) {
+        state.mathIdx++;
+        renderMath();
+      } else {
+        completeSection('math', 'Počítání hotovo!', 'Vyřešil jsi všechny příklady!');
+        state.mathProblems = generateMathProblems(state.mathMode);
+        state.mathIdx = 0;
+        state.mathStreak = 0;
+      }
+    }, 700);
+  } else {
+    btn.classList.add('wrong');
+    state.mathStreak = 0;
+    document.querySelectorAll('.math-answer').forEach(b => {
+      if (Number(b.textContent) === p.answer) b.classList.add('correct');
+    });
+    setTimeout(() => renderMath(), 1600);
+  }
+}
+
+document.querySelectorAll('#mathModeRow .pill').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('#mathModeRow .pill').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    state.mathMode = p.getAttribute('data-mathmode');
+    state.mathProblems = generateMathProblems(state.mathMode);
+    state.mathIdx = 0; state.mathStreak = 0;
+    renderMath();
+  });
+});
+
+document.querySelectorAll('.sym-pick').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('.sym-pick').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    state.mathSym = p.getAttribute('data-sym');
+    renderMath();
+  });
+});
+
+document.getElementById('mathNewSet').addEventListener('click', () => {
+  state.mathProblems = generateMathProblems(state.mathMode);
+  state.mathIdx = 0; state.mathStreak = 0;
+  renderMath();
 });
 
 /* ════ REWARD ════ */

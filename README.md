@@ -1,19 +1,20 @@
 # Čtení – krok za krokem
 
-Jednoduchá webová aplikace pro výuku čtení určená dětem s PAS (poruchou autistického spektra) a ADHD ve věku 6–9 let.
+Webová aplikace pro výuku čtení a počítání určená dětem s PAS (poruchou autistického spektra) a ADHD ve věku 6–9 let.
 
 **Živá verze:** https://navidofek-cmyk.github.io/aac_static_web/
 
 ---
 
-## Co aplikace umí
+## Sekce
 
-Čtyři sekce seřazené od nejjednoduššího po složitější:
-
-1. **Slabiky** – otevřené slabiky rozdělené do skupin podle počáteční hlásky (M, L, S, P, T…)
-2. **Slova** – dvojslabičná a trojslabičná slova s vizuálním oddělením slabik
-3. **Věty** – krátké věty s klikacími slovy
-4. **Krátké pohádky** – tři příběhy složené z naučených slov
+| # | Název | Obsah |
+|---|---|---|
+| 1 | **Slabiky** | Otevřené slabiky po skupinách (M, L, S, P, T, V, B, N, D, K, J, R) |
+| 2 | **Slova** | ~27 slov s ARASAAC / Mulberry obrázky, klikací slabiky |
+| 3 | **Věty** | 15 krátkých vět s klikacími slovy |
+| 4 | **Krátké pohádky** | 3 příběhy složené z naučených slov |
+| 5 | **Počítání** | Sčítání, odčítání, řady, rozklad čísel do 15 s vizuálními symboly |
 
 ---
 
@@ -21,22 +22,30 @@ Jednoduchá webová aplikace pro výuku čtení určená dětem s PAS (poruchou 
 
 | Funkce | Popis |
 |---|---|
-| **Fokus mód** | Slabiky zobrazuje jednu po druhé místo celé mřížky — méně vizuálního rušení |
+| **Fokus mód** | Slabiky zobrazuje jednu po druhé místo celé mřížky |
 | **Auto-čtení** | Při přechodu na další položku ji automaticky přečte nahlas |
-| **Tlačítko Zopakovat** | Velké, výrazné tlačítko vždy na stejném místě — okamžité opakování bez hledání |
-| **Micro-odměna** | Každých 5 kroků se zobrazí létající hvězdička — okamžitá pozitivní zpětná vazba |
-| **Připomínač přestávky** | Volitelně připomene pauzu po 5 nebo 10 krocích |
-| **Hvězdičky** | Celkový počet splněných sekcí viditelný v hlavičce |
+| **Tlačítko Zopakovat** | Velké, výrazné, vždy na stejném místě |
+| **Vizuální symboly** | Pod příklady v počítání: ● ★ ♥ ☺ (volitelně) |
+| **Micro-odměna** | Každých 5 kroků létající hvězdička |
+| **Připomínač přestávky** | Volitelně po 5 nebo 10 krocích |
+| **Hvězdičky** | Celkový progres viditelný v hlavičce |
+
+---
+
+## Obrázky ke slovům
+
+- **ARASAAC** (https://arasaac.org) — většina slov, licence CC BY-NC-SA
+- **Mulberry Symbols** (https://github.com/mulberrysymbols/mulberry-symbols) — Ema, Eva, mele, licence CC BY-SA
 
 ---
 
 ## Nastavení
 
-Vše se ukládá do prohlížeče (localStorage), takže nastavení přetrvá i po zavření.
+Vše se ukládá v prohlížeči (localStorage).
 
 - Velikost písma: malé / střední / velké
 - Oddělovat slabiky: ano / ne
-- Číst nahlas: zapnuto / vypnuto
+- Číst nahlas: zapnuto / vypnuto (Web Speech API, hledá hlas `cs-CZ`)
 - Rychlost čtení: pomalu / normálně / rychle
 - Auto-čtení: zapnuto / vypnuto
 - Fokus mód: zapnuto / vypnuto
@@ -47,15 +56,13 @@ Vše se ukládá do prohlížeče (localStorage), takže nastavení přetrvá i 
 ## Technické info
 
 - Čistý HTML/CSS/JS — žádné závislosti, žádný build
-- Funguje offline (po prvním načtení)
-- Čtení nahlas přes Web Speech API (hledá český hlas `cs-CZ`)
 - Jeden soubor: `index.html`
+- Obrázky načítány z ARASAAC a Mulberry CDN (vyžaduje internet)
+- Text a TTS fungují offline
 
 ---
 
 ## Lokální spuštění
-
-Stačí otevřít `index.html` v prohlížeči. Žádný server není potřeba.
 
 ```bash
 git clone https://github.com/navidofek-cmyk/aac_static_web.git

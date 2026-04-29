@@ -546,7 +546,9 @@ const WORDS = [
 
 const WORD_PICS = {
   'táta':31146, 'baba':23710, 'bába':23710,
-  'Ema':0,      'Eva':0,      'mele':0,     // ← doplň ID
+  'Ema':  'https://raw.githubusercontent.com/mulberrysymbols/mulberry-symbols/master/EN/daughter.svg',
+  'Eva':  'https://raw.githubusercontent.com/mulberrysymbols/mulberry-symbols/master/EN/daughter.svg',
+  'mele': 'https://raw.githubusercontent.com/mulberrysymbols/mulberry-symbols/master/EN/bake_%2C_to.svg',
   'mísa':3257,  'váza':3271,  'voda':32464, 'noha':25327,
   'sova':2671,  'vosa':6925,  'koza':25887, 'lupa':9927,
   'kolo':6935,  'pole':2683,  'ryba':2520,  'tele':26489,
@@ -882,11 +884,13 @@ function renderWord(autoplay = false) {
   const card = display.parentElement;
   const oldPic = card.querySelector('.word-pic');
   if (oldPic) oldPic.remove();
-  const picId = WORD_PICS[fullText];
-  if (picId) {
+  const picVal = WORD_PICS[fullText];
+  if (picVal) {
     const img = document.createElement('img');
     img.className = 'word-pic';
-    img.src = `https://static.arasaac.org/pictograms/${picId}/${picId}_300.png`;
+    img.src = typeof picVal === 'number'
+      ? `https://static.arasaac.org/pictograms/${picVal}/${picVal}_300.png`
+      : picVal;
     img.alt = fullText;
     img.loading = 'lazy';
     card.insertBefore(img, display);
